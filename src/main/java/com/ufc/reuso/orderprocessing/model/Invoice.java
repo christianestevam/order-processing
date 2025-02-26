@@ -8,7 +8,10 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "invoices")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,5 +30,12 @@ public class Invoice {
     @PrePersist
     protected void onCreate() {
         issuedAt = LocalDateTime.now();
+    }
+
+    public Invoice(UUID orderId, String invoiceNumber, String invoicePdfUrl) {
+        this.orderId = orderId;
+        this.invoiceNumber = invoiceNumber;
+        this.invoicePdfUrl = invoicePdfUrl;
+        this.issuedAt = LocalDateTime.now();
     }
 }
