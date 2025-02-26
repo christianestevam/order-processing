@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_order_processing
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: order_processing
+    ports:
+      - "5434:5432"  # Corrigindo porta para evitar conflito
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  order-processing:
+    build: .
+    container_name: order_processing_app
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/order_processing
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    networks:
+      - orchestrator_network
+    ports:
+      - "8081:8081"
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  orchestrator_network:
+    external: true  # 🔹 Usa a mesma rede do orquestrador
